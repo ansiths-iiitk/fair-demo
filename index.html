@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>html{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Who Gets Flagged?</title>
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Who Gets a Call?</title>
 <style>
-/* Layout: one reading column; the two school groups sit side by side on wide screens and stack on phones. */
+/* Layout: one reading column; the two student groups sit side by side on wide screens and stack on phones. */
 :root{
   --bg:#fbfaf8; --panel:#ffffff; --fg:#1d1a1a; --muted:#5f5656; --line:#d9d2d0;
-  --accent:#7a1f2b; --accent-fg:#ffffff; --miss:#c26a00; --ok:#2f6b3a; --idle:#b9b0ae;
+  --accent:#7a1f2b; --accent-fg:#ffffff; --miss:#c26a00; --ok:#2f6b3a; --idle:#b9b0ae; --soft:#f3ecea;
   --serif:"Times New Roman",Times,"Liberation Serif",serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#171415; --panel:#201c1d; --fg:#ece6e4; --muted:#a99f9d; --line:#3a3335;
-  --accent:#d4707e; --accent-fg:#171415; --miss:#f0a040; --ok:#7cc48a; --idle:#5a5153; color-scheme:dark}}
+  --accent:#d4707e; --accent-fg:#171415; --miss:#f0a040; --ok:#7cc48a; --idle:#5a5153; --soft:#2a2325; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#171415; --panel:#201c1d; --fg:#ece6e4; --muted:#a99f9d; --line:#3a3335;
-  --accent:#d4707e; --accent-fg:#171415; --miss:#f0a040; --ok:#7cc48a; --idle:#5a5153; color-scheme:dark}
+  --accent:#d4707e; --accent-fg:#171415; --miss:#f0a040; --ok:#7cc48a; --idle:#5a5153; --soft:#2a2325; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--serif);font-size:18px;line-height:1.5}
 .wrap{max-width:980px;margin:0 auto;padding-block:28px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
 h1,h2,h3{font-weight:700;text-wrap:balance;margin:0;line-height:1.2}
@@ -25,10 +25,12 @@ h1{font-size:2.1rem;color:var(--accent)}
 h2{font-size:1.5rem;border-bottom:2px solid var(--accent);padding-bottom:6px}
 h3{font-size:1.15rem}
 p{margin:0;max-width:68ch}
+ol,ul{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:4px;max-width:68ch}
 .lead{display:flex;flex-direction:column;gap:10px}
 .small{font-size:.92rem;color:var(--muted)}
 .part{display:flex;flex-direction:column;gap:18px}
 .tag{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.box{background:var(--soft);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px}
 .group{background:var(--panel);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .grid{display:grid;grid-template-columns:repeat(20,1fr);gap:2px}
@@ -37,9 +39,9 @@ p{margin:0;max-width:68ch}
 .cell.f{border-color:var(--accent)}
 .cell.f.risk{background:var(--accent)}
 .cell.miss{background:var(--miss);border-color:var(--miss)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.88rem;color:var(--muted)}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend i{display:inline-block;width:13px;height:13px;border:1.5px solid}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:6px 16px;font-size:.95rem}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{display:inline-block;flex:none;width:15px;height:15px;border:1.5px solid}
 .lg1{background:var(--accent);border-color:var(--accent)!important}
 .lg2{border-color:var(--accent)!important}
 .lg3{background:var(--miss);border-color:var(--miss)!important}
@@ -47,13 +49,13 @@ p{margin:0;max-width:68ch}
 .slider{display:flex;align-items:center;gap:12px}
 .slider input{flex:1;accent-color:var(--accent);min-width:0}
 .slider output{font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right;font-weight:700}
-.stats{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-variant-numeric:tabular-nums;margin:0}
 .stats dt{color:var(--muted)}
 .stats dd{margin:0;text-align:right}
 .stats dd b{font-size:1.1rem}
 .lock{display:flex;align-items:center;gap:10px;font-size:1rem}
 .lock input{width:20px;height:20px;accent-color:var(--accent)}
-.compare{overflow-x:auto}
+.scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right}
 th:first-child,td:first-child{text-align:left}
@@ -66,18 +68,20 @@ th{font-weight:700;color:var(--muted);font-size:.9rem}
 .chip{display:inline-block;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--muted);color:var(--muted);margin-left:6px;vertical-align:2px}
 .chip.done{border-color:var(--ok);color:var(--ok);font-weight:700}
 .note{border-left:3px solid var(--accent);padding:6px 0 6px 14px}
+.banner{border:2px solid var(--accent);padding:12px 14px;font-weight:700}
 .cols{display:flex;flex-wrap:wrap;gap:10px}
-.colbtn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);padding:8px 12px;font:inherit;font-size:1rem;cursor:pointer}
+.colbtn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);padding:8px 12px;font-size:1rem;cursor:pointer}
 .colbtn input{width:18px;height:18px;accent-color:var(--accent)}
 button.train{font:inherit;font-size:1.05rem;font-weight:700;background:var(--accent);color:var(--accent-fg);border:0;padding:10px 20px;cursor:pointer;align-self:flex-start}
-button.train:focus-visible,.colbtn:focus-within,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.train:focus-visible,.colbtn:focus-within,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px}
 .student{background:var(--panel);border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .student .score{font-size:2.2rem;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
-.bar{height:10px;background:var(--line)}
-.bar>div{height:100%;background:var(--accent);transition:width .4s}
-@media (prefers-reduced-motion:reduce){.bar>div{transition:none}}
-.status{min-height:1.5em;color:var(--muted);font-size:.95rem}
+.student .score small{font-size:1rem;color:var(--muted);font-weight:400}
+.status{min-height:1.5em;font-size:1rem}
+details{border:1px solid var(--line);background:var(--panel);padding:10px 14px}
+details[open]{display:flex;flex-direction:column;gap:10px}
+summary{cursor:pointer;font-weight:700;color:var(--accent)}
 footer{font-size:.88rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
 </style>
 </head>
@@ -86,67 +90,101 @@ footer{font-size:.88rem;color:var(--muted);border-top:1px solid var(--line);padd
 
 <div class="wrap">
 <header class="lead">
-  <h1>Who gets flagged?</h1>
-  <p>A college uses an AI model to flag students who may fail the semester, so the support team can help them early. The model gives every student a <b>risk score</b> from 0 to 99. Students at or above the <b>cut-off</b> are flagged.</p>
-  <p>Here are 400 students: 200 from city schools and 200 from rural schools. The semester is over, so we also know who actually failed. Your job is to choose the cut-off.</p>
+  <h1>Who gets a call?</h1>
+  <p>A college wants to help students <b>before</b> they fail. A computer program (an AI model) looks at each student's attendance and marks and gives a <b>risk score</b> from 0 to 99. A high score means “this student may fail”.</p>
+  <p>The support team cannot call everyone. So you draw a line, the <b>cut-off</b>. Every student whose score is <b>at or above</b> the cut-off gets a call from the support team.</p>
+  <div class="box">
+    <b>After the exam, every student falls into one of four boxes:</b>
+    <div class="legend">
+      <span><i class="lg1"></i>Called, and really needed help. Good.</span>
+      <span><i class="lg2"></i>Called, but was fine. An <b>unnecessary call</b>.</span>
+      <span><i class="lg3"></i>Not called, and failed. <b>Missed</b>: nobody helped.</span>
+      <span><i class="lg4"></i>Not called, and was fine. Good.</span>
+    </div>
+  </div>
+  <p class="small">Everything on this page is made up for teaching. No real student data is used.</p>
 </header>
 
 <section class="part" id="part1">
   <div><div class="tag">Part 1</div><h2>Set the cut-off</h2></div>
-  <div class="legend">
-    <span><i class="lg1"></i>Flagged, and really at risk</span>
-    <span><i class="lg2"></i>Flagged, but was fine (false alarm)</span>
-    <span><i class="lg3"></i>Not flagged, but failed (missed)</span>
-    <span><i class="lg4"></i>Not flagged, was fine</span>
+  <p>Here are 400 students: <b>200 hostel students</b> and <b>200 day scholars</b>. Each small square is one student. Squares are sorted by risk score, highest first. The exam is over, so we already know who really failed.</p>
+  <div class="box">
+    <b>What to do</b>
+    <ol>
+      <li>Move the slider. Watch the squares change colour.</li>
+      <li>Untick “Use one cut-off for both groups” to give each group its own cut-off.</li>
+      <li>Try the three challenges further down.</li>
+    </ol>
   </div>
-  <p class="small">Each square is one student. Squares are sorted by risk score, highest first.</p>
   <label class="lock"><input type="checkbox" id="lock" checked> Use one cut-off for both groups</label>
   <div class="groups" id="groups"></div>
 
-  <div class="compare">
+  <h3>Compare the two groups</h3>
+  <div class="scroll">
     <table>
-      <thead><tr><th>Measure</th><th>City</th><th>Rural</th><th>Gap</th></tr></thead>
+      <thead><tr><th>Out of each group</th><th>Hostel</th><th>Day scholars</th><th>Difference</th></tr></thead>
       <tbody id="cmp"></tbody>
     </table>
   </div>
+  <p class="small">In this made-up data, more day scholars fail (72 of 200) than hostel students (23 of 200). We chose this on purpose, to show what happens when two groups start from different situations. It is not a real finding about any group.</p>
 
   <h3>Three challenges</h3>
-  <p class="small">A challenge counts when the two groups are within 4 percentage points of each other, and between 10% and 50% of each group is flagged, because that is what the support team can handle.</p>
   <p class="small" id="range" style="color:var(--miss)"></p>
   <div class="challenges">
-    <div class="ch"><div class="n">1</div><div><b>Treat the groups the same way.</b> Flag the same share of city and rural students.<span class="chip" id="c1">Not yet</span></div></div>
-    <div class="ch"><div class="n">2</div><div><b>Miss no group more than the other.</b> Make the share of failing students who were missed the same in both groups.<span class="chip" id="c2">Not yet</span><div class="small" id="c2note"></div></div></div>
-    <div class="ch"><div class="n">3</div><div><b>Do challenge 1 and make the flags equally trustworthy.</b> Same share flagged, and the same share of false alarms among the flagged.<span class="chip" id="c3">Not yet</span><div class="small" id="c3note"></div></div></div>
+    <div class="ch"><div class="n">1</div><div><b>Call the same share of students in each group.</b><span class="chip" id="c1">Not yet</span></div></div>
+    <div class="ch"><div class="n">2</div><div><b>Miss the same share of failing students in each group.</b><span class="chip" id="c2">Not yet</span><div class="small" id="c2note"></div></div></div>
+    <div class="ch"><div class="n">3</div><div><b>Do challenges 1 and 2 at the same time.</b><span class="chip" id="c3">Not yet</span><div class="small" id="c3note"></div></div></div>
   </div>
-  <p class="note">When you have tried all three, decide: if you ran this college, which rule would you use, and who pays for that choice? Post your answer in Poll Parrot.</p>
+  <p class="small">Game rules: “the same” means the two groups are within 4 points of each other, and each group must have between 10% and 40% called, because that is all the support team can handle. These are rules for this classroom game, not official fairness standards. “Done” means you hit the target. It does not mean the system is now fair.</p>
+  <p class="note">Which rule would you use for your college, and who pays for that choice? Post your answer in Poll Parrot.</p>
+  <details>
+    <summary>Why can't challenge 3 be done? (open after you try)</summary>
+    <p>72 day scholars failed, but only 23 hostel students. Day scholars need about three times as much help.</p>
+    <p>If you call the same share of each group (challenge 1), more of the day scholars who need help are left out. If you call enough day scholars to miss the same share (challenge 2), you must call many more day scholars than hostel students.</p>
+    <p>When two groups start from different situations, you cannot make every measure equal at the same time. Someone has to decide which one matters most. That decision is a human choice, not something the computer can make for you.</p>
+  </details>
 </section>
 
 <section class="part" id="part2">
   <div><div class="tag">Part 2</div><h2>Delete the column</h2></div>
-  <p>Another college built a model to shortlist students for a research internship. It learned from five years of past shortlists made by faculty: 600 students, 300 from city schools and 300 from rural schools. In those past lists, rural students were chosen less often.</p>
-  <p>Below are two new students with the <b>same marks and the same attendance</b>. Train the model and compare their scores. Then remove columns and train again.</p>
+  <p class="banner">This is a different system. Here a high score is good for the student: it means the student is more likely to be shortlisted.</p>
+  <p>A college built a program to shortlist students for a research internship. It learned from <b>five years of past shortlists</b>: 600 students, 300 from city schools and 300 from rural schools. In those past shortlists, rural students were chosen less often.</p>
+  <p>Meera and Lakshmi have <b>the same marks and the same attendance</b>. On merit, they are equal.</p>
   <div class="pair">
-    <div class="student"><h3>Meera</h3><div class="small">City school · 20 min to college · attendance 88% · marks 78</div><div class="score" id="sA">–</div><div class="small">chance of being shortlisted</div></div>
-    <div class="student"><h3>Lakshmi</h3><div class="small">Rural school · 80 min to college · attendance 88% · marks 78</div><div class="score" id="sB">–</div><div class="small">chance of being shortlisted</div></div>
+    <div class="student"><h3>Meera</h3><div class="small">City school · 20 minutes' travel to college · attendance 88% · marks 78</div><div class="score" id="sA">–</div><div class="small">Shortlist score from the model</div></div>
+    <div class="student"><h3>Lakshmi</h3><div class="small">Rural school · 80 minutes' travel to college · attendance 88% · marks 78</div><div class="score" id="sB">–</div><div class="small">Shortlist score from the model</div></div>
   </div>
-  <div><h3>Columns the model can use</h3></div>
+  <div class="box">
+    <b>What to do</b>
+    <ol>
+      <li>Press <b>Train the model</b> with all four boxes ticked. Compare Meera and Lakshmi.</li>
+      <li>Untick <b>School type</b> and train again. Did the gap close?</li>
+      <li>Untick <b>Travel time</b> as well and train again. What happens now?</li>
+    </ol>
+  </div>
+  <h3>Information the model is allowed to use</h3>
   <div class="cols" id="cols"></div>
   <button class="train" id="train" type="button">Train the model</button>
   <div class="status" id="status" aria-live="polite"></div>
-  <div>
-    <h3>Shortlist: top 20% of all 600 students</h3>
-    <div class="stats" style="margin-top:8px">
-      <dt>City students shortlisted</dt><dd><b id="rA">–</b></dd>
-      <dt>Rural students shortlisted</dt><dd><b id="rB">–</b></dd>
-    </div>
-  </div>
-  <div class="compare">
+  <div class="scroll">
     <h3 style="margin-bottom:6px">Your training runs</h3>
     <table>
-      <thead><tr><th>Columns used</th><th>Meera</th><th>Lakshmi</th><th>City shortlisted</th><th>Rural shortlisted</th></tr></thead>
-      <tbody id="runs"><tr><td colspan="5" class="small" style="text-align:left">No runs yet. Press “Train the model”.</td></tr></tbody>
+      <thead><tr><th>Information used</th><th>Meera</th><th>Lakshmi</th><th>Gap</th><th>City students shortlisted</th><th>Rural students shortlisted</th></tr></thead>
+      <tbody id="runs"><tr><td colspan="6" class="small" style="text-align:left">No runs yet. Press “Train the model”.</td></tr></tbody>
     </table>
   </div>
+  <p class="small">The shortlist is the top 20% of all 600 students: 120 students.</p>
+  <details>
+    <summary>Why did this happen? (open after step 2)</summary>
+    <p>The model copied the past shortlists. In the past, rural students were chosen less often, so the model learned “rural student: give a lower score”.</p>
+    <p>When you removed <b>School type</b>, the model still knew who was rural. In this data, city students travel about 20 minutes and rural students about 80 minutes. So travel time gave the same information. Information that secretly stands in for a hidden column is called a <b>proxy</b>.</p>
+    <p>Deleting a column does not guarantee a fair result. And deleting every related column is not automatically right either:</p>
+    <ul>
+      <li>A long daily journey may really affect a student's studies. Should the model ignore it?</li>
+      <li>Marks and attendance may themselves reflect unequal chances, such as the quality of a student's school.</li>
+    </ul>
+    <p>The real problem was in the past shortlists the model learned from. Amazon found the same thing in 2015 with a hiring tool that learned from ten years of mostly male resumes.</p>
+  </details>
 </section>
 
 <footer>All students on this page are made up for teaching. No real student data is used. FACTS-H Lab, IIIT Kottayam.</footer>
@@ -157,8 +195,8 @@ const DATA = {"p1":{"A":[[26,1],[53,0],[4,0],[1,0],[1,0],[0,0],[0,0],[13,0],[3,0
 
 /* ---------- Part 1 ---------- */
 const groups = [
-  {key:"A", name:"City schools", rows:DATA.p1.A, cut:40},
-  {key:"B", name:"Rural schools", rows:DATA.p1.B, cut:40}
+  {key:"A", name:"Hostel students", rows:DATA.p1.A, cut:40},
+  {key:"B", name:"Day scholars", rows:DATA.p1.B, cut:40}
 ];
 groups.forEach(g=>{ g.rows = g.rows.map(r=>({s:r[0], y:r[1]})).sort((a,b)=>b.s-a.s || b.y-a.y); g.pos = g.rows.filter(r=>r.y).length; });
 
@@ -166,9 +204,9 @@ const lock = document.getElementById("lock");
 const box = document.getElementById("groups");
 groups.forEach(g=>{
   const el = document.createElement("div"); el.className="group";
-  el.innerHTML = `<h3>${g.name} <span class="small">(${g.pos} of 200 actually failed)</span></h3>
+  el.innerHTML = `<h3>${g.name} <span class="small">(${g.pos} of 200 really failed)</span></h3>
     <div class="slider"><label for="cut${g.key}" class="small">Cut-off</label><input type="range" id="cut${g.key}" min="0" max="99" value="${g.cut}"><output id="out${g.key}"></output></div>
-    <div class="grid" id="grid${g.key}"></div>
+    <div class="grid"></div>
     <dl class="stats" id="st${g.key}"></dl>`;
   box.appendChild(el);
   const grid = el.querySelector(".grid");
@@ -191,45 +229,44 @@ function draw(){
     document.getElementById("out"+g.key).textContent = g.cut;
     g.rows.forEach((row,i)=>{ const fl=row.s>=g.cut; g.cells[i].className="cell"+(row.y?" risk":"")+(fl?" f":"")+(!fl&&row.y?" miss":""); });
     document.getElementById("st"+g.key).innerHTML =
-      `<dt>Flagged</dt><dd><b>${r.f}</b> of 200 (${pct(r.flag)})</dd>
-       <dt>Failing students missed</dt><dd><b>${r.miss}</b> of ${g.pos} (${pct(r.missP)})</dd>
-       <dt>False alarms among flagged</dt><dd><b>${r.fp}</b> of ${r.f} (${pct(r.faP)})</dd>`;
+      `<dt>Called</dt><dd><b>${r.f}</b> of 200</dd>
+       <dt>Failed but not called (missed)</dt><dd><b>${r.miss}</b> of ${g.pos} who failed</dd>
+       <dt>Called but was fine (unnecessary)</dt><dd><b>${r.fp}</b> of ${r.f} calls</dd>`;
     return r;
   });
-  const rows = [["Share flagged","flag"],["Failing students missed","missP"],["False alarms among flagged","faP"]];
+  const rows = [["Share of students called","flag"],["Share of failing students missed","missP"]];
   document.getElementById("cmp").innerHTML = rows.map(([lab,k])=>{
     const a=m[0][k], b=m[1][k]; const gap = (a==null||b==null)? null : Math.abs(a-b);
     const cls = gap==null? "" : gap<=4 ? "gap-ok" : "gap-big";
-    return `<tr><td>${lab}</td><td>${pct(a)}</td><td>${pct(b)}</td><td class="${cls}">${gap==null?"–":gap.toFixed(1)+" pts"}</td></tr>`;
+    return `<tr><td>${lab}</td><td>${pct(a)}</td><td>${pct(b)}</td><td class="${cls}">${gap==null?"–":gap.toFixed(1)+" points"}</td></tr>`;
   }).join("");
-  const enough = m.every(r=>r.flag>=10 && r.flag<=50);
+  const enough = m.every(r=>r.flag>=10 && r.flag<=40);
   const d1 = Math.abs(m[0].flag-m[1].flag), d2 = Math.abs(m[0].missP-m[1].missP);
   const d3 = (m[0].faP==null||m[1].faP==null)? null : Math.abs(m[0].faP-m[1].faP);
-  document.getElementById("range").textContent = enough ? "" : "Right now one group has less than 10% or more than 50% flagged, so the challenges do not count yet.";
+  document.getElementById("range").textContent = enough ? "" : "Right now one group has less than 10% or more than 40% called, so the challenges do not count yet.";
   setChip("c1", enough && d1<=4);
   setChip("c2", enough && d2<=4);
-  const ok3 = enough && d1<=4 && d3!=null && d3<=4;
-  setChip("c3", ok3);
-  if(enough && d1<=4 && d3!=null){ if(best3==null || d3<best3) best3=d3; }
+  setChip("c3", enough && d1<=4 && d2<=4);
+  if(enough){ const g=Math.max(d1,d2); if(best3==null || g<best3) best3=g; }
   document.getElementById("c3note").textContent = best3==null ? "" :
-    `Closest you have reached with equal flag shares: false alarms ${best3.toFixed(1)} points apart.`;
+    `Closest you have reached: the bigger of the two differences is ${best3.toFixed(1)} points. You need 4 or less on both rows.`;
   document.getElementById("c2note").textContent = (enough && d2<=4) ?
-    `Now look at the share flagged: ${pct(m[0].flag)} of city students against ${pct(m[1].flag)} of rural students.` : "";
+    `Now look at how many are called: ${pct(m[0].flag)} of hostel students, ${pct(m[1].flag)} of day scholars.` : "";
 }
 function setChip(id,ok){ const c=document.getElementById(id); c.textContent= ok?"Done":"Not yet"; c.className="chip"+(ok?" done":""); }
 draw();
 
 /* ---------- Part 2 ---------- */
 const COLS = [
-  {k:"school", label:"School type (city or rural)", i:0},
-  {k:"travel", label:"Travel time to college", i:1},
-  {k:"att", label:"Attendance", i:2},
-  {k:"marks", label:"Marks", i:3}
+  {k:"school", label:"School type", hint:"city or rural", i:0},
+  {k:"travel", label:"Travel time", hint:"minutes to college", i:1},
+  {k:"att", label:"Attendance", hint:"", i:2},
+  {k:"marks", label:"Marks", hint:"", i:3}
 ];
 const P2 = DATA.p2;              // [rural, travel, attendance, marks, shortlisted]
 const MEERA = [0,20,88,78], LAKSHMI = [1,80,88,78];
 const colBox = document.getElementById("cols");
-COLS.forEach(c=>{ const l=document.createElement("label"); l.className="colbtn"; l.innerHTML=`<input type="checkbox" id="col-${c.k}" checked> ${c.label}`; colBox.appendChild(l); c.box=l.querySelector("input"); });
+COLS.forEach(c=>{ const l=document.createElement("label"); l.className="colbtn"; l.innerHTML=`<input type="checkbox" id="col-${c.k}" checked> ${c.label}${c.hint?` <span class="small">(${c.hint})</span>`:""}`; colBox.appendChild(l); c.box=l.querySelector("input"); });
 
 function trainLR(X,y){
   const n=X.length, d=X[0].length;
@@ -248,8 +285,7 @@ function trainLR(X,y){
 }
 function runTraining(){
   const use = COLS.filter(c=>c.box.checked);
-  const st = document.getElementById("status");
-  if(!use.length){ st.textContent="Tick at least one column, then train again."; return null; }
+  if(!use.length) return null;
   const pick = r => use.map(c=>r[c.i]);
   const model = trainLR(P2.map(pick), P2.map(r=>r[4]));
   const scores = P2.map(r=>model(pick(r)));
@@ -258,20 +294,21 @@ function runTraining(){
   let a=0,b=0; order.forEach(([s,i])=>{ P2[i][0]? b++ : a++; });
   const sa=Math.round(100*model(pick(MEERA))), sb=Math.round(100*model(pick(LAKSHMI)));
   const nA=P2.filter(r=>!r[0]).length, nB=P2.length-nA;
-  return {use, sa, sb, ra:100*a/nA, rb:100*b/nB, a, b, nA, nB};
+  return {use, sa, sb, a, b, nA, nB};
 }
 let runs=[];
 document.getElementById("train").addEventListener("click",()=>{
-  const st=document.getElementById("status"); st.textContent="Training on 600 past students…";
+  const st=document.getElementById("status");
+  if(!COLS.some(c=>c.box.checked)){ st.textContent="Tick at least one box, then train again."; return; }
+  st.textContent="Learning from 600 past students…";
   setTimeout(()=>{
     const r=runTraining(); if(!r) return;
-    document.getElementById("sA").textContent=r.sa+"%";
-    document.getElementById("sB").textContent=r.sb+"%";
-    document.getElementById("rA").textContent=`${r.a} of ${r.nA} (${r.ra.toFixed(1)}%)`;
-    document.getElementById("rB").textContent=`${r.b} of ${r.nB} (${r.rb.toFixed(1)}%)`;
-    st.textContent="Trained using: "+r.use.map(c=>c.label.toLowerCase()).join(", ")+".";
+    document.getElementById("sA").innerHTML=r.sa+" <small>/ 100</small>";
+    document.getElementById("sB").innerHTML=r.sb+" <small>/ 100</small>";
+    const gap=Math.abs(r.sa-r.sb);
+    st.innerHTML = gap<=3 ? `<b>Meera and Lakshmi now get almost the same score</b> (gap of ${gap}).` : `<b>Lakshmi gets ${gap} points less than Meera</b>, even though their marks and attendance are the same.`;
     runs.unshift(r);
-    document.getElementById("runs").innerHTML = runs.map(x=>`<tr><td>${x.use.map(c=>c.label.split(" (")[0]).join(", ")}</td><td>${x.sa}%</td><td>${x.sb}%</td><td>${x.ra.toFixed(1)}%</td><td>${x.rb.toFixed(1)}%</td></tr>`).join("");
+    document.getElementById("runs").innerHTML = runs.map(x=>`<tr><td>${x.use.map(c=>c.label).join(", ")}</td><td>${x.sa}</td><td>${x.sb}</td><td>${Math.abs(x.sa-x.sb)}</td><td>${x.a} of ${x.nA}</td><td>${x.b} of ${x.nB}</td></tr>`).join("");
   },30);
 });
 </script>
