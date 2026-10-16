@@ -94,11 +94,11 @@ footer{font-size:.88rem;color:var(--muted);border-top:1px solid var(--line);padd
   <p>A college wants to help students <b>before</b> they fail. A computer program (an AI model) looks at each student's attendance and marks and gives a <b>risk score</b> from 0 to 99. A high score means “this student may fail”.</p>
   <p>The support team cannot call everyone. So you draw a line, the <b>cut-off</b>. Every student whose score is <b>at or above</b> the cut-off gets a call from the support team.</p>
   <div class="box">
-    <b>After the exam, every student falls into one of four boxes:</b>
+    <b>Every student falls into one of four boxes.</b> “Needed help” means the student was really at risk: without help, they would fail.
     <div class="legend">
       <span><i class="lg1"></i>Called, and really needed help. Good.</span>
       <span><i class="lg2"></i>Called, but was fine. An <b>unnecessary call</b>.</span>
-      <span><i class="lg3"></i>Not called, and failed. <b>Missed</b>: nobody helped.</span>
+      <span><i class="lg3"></i>Not called, but needed help. <b>Missed</b>: no help came.</span>
       <span><i class="lg4"></i>Not called, and was fine. Good.</span>
     </div>
   </div>
@@ -107,7 +107,7 @@ footer{font-size:.88rem;color:var(--muted);border-top:1px solid var(--line);padd
 
 <section class="part" id="part1">
   <div><div class="tag">Part 1</div><h2>Set the cut-off</h2></div>
-  <p>Here are 400 students: <b>200 hostel students</b> and <b>200 day scholars</b>. Each small square is one student. Squares are sorted by risk score, highest first. The exam is over, so we already know who really failed.</p>
+  <p>Here are 400 students: <b>200 hostel students</b> and <b>200 day scholars</b>. Each small square is one student. Squares are sorted by risk score, highest first. The semester is over, so we already know which students really needed help.</p>
   <div class="box">
     <b>What to do</b>
     <ol>
@@ -126,20 +126,20 @@ footer{font-size:.88rem;color:var(--muted);border-top:1px solid var(--line);padd
       <tbody id="cmp"></tbody>
     </table>
   </div>
-  <p class="small">In this made-up data, more day scholars fail (72 of 200) than hostel students (23 of 200). We chose this on purpose, to show what happens when two groups start from different situations. It is not a real finding about any group.</p>
+  <p class="small">In this made-up data, more day scholars need help (72 of 200) than hostel students (23 of 200), for example because of long daily travel, not lower ability. We chose this on purpose, to show what happens when two groups start from different situations. It is not a real finding about any group.</p>
 
   <h3>Three challenges</h3>
   <p class="small" id="range" style="color:var(--miss)"></p>
   <div class="challenges">
     <div class="ch"><div class="n">1</div><div><b>Call the same share of students in each group.</b><span class="chip" id="c1">Not yet</span></div></div>
-    <div class="ch"><div class="n">2</div><div><b>Miss the same share of failing students in each group.</b><span class="chip" id="c2">Not yet</span><div class="small" id="c2note"></div></div></div>
+    <div class="ch"><div class="n">2</div><div><b>Miss the same share of students who need help in each group.</b><span class="chip" id="c2">Not yet</span><div class="small" id="c2note"></div></div></div>
     <div class="ch"><div class="n">3</div><div><b>Do challenges 1 and 2 at the same time.</b><span class="chip" id="c3">Not yet</span><div class="small" id="c3note"></div></div></div>
   </div>
   <p class="small">Game rules: “the same” means the two groups are within 4 points of each other, and each group must have between 10% and 40% called, because that is all the support team can handle. These are rules for this classroom game, not official fairness standards. “Done” means you hit the target. It does not mean the system is now fair.</p>
   <p class="note">Which rule would you use for your college, and who pays for that choice? Post your answer in Poll Parrot.</p>
   <details>
     <summary>Why can't challenge 3 be done? (open after you try)</summary>
-    <p>72 day scholars failed, but only 23 hostel students. Day scholars need about three times as much help.</p>
+    <p>72 day scholars needed help, but only 23 hostel students. Day scholars need about three times as much help.</p>
     <p>If you call the same share of each group (challenge 1), more of the day scholars who need help are left out. If you call enough day scholars to miss the same share (challenge 2), you must call many more day scholars than hostel students.</p>
     <p>When two groups start from different situations, you cannot make every measure equal at the same time. Someone has to decide which one matters most. That decision is a human choice, not something the computer can make for you.</p>
   </details>
@@ -204,7 +204,7 @@ const lock = document.getElementById("lock");
 const box = document.getElementById("groups");
 groups.forEach(g=>{
   const el = document.createElement("div"); el.className="group";
-  el.innerHTML = `<h3>${g.name} <span class="small">(${g.pos} of 200 really failed)</span></h3>
+  el.innerHTML = `<h3>${g.name} <span class="small">(${g.pos} of 200 needed help)</span></h3>
     <div class="slider"><label for="cut${g.key}" class="small">Cut-off</label><input type="range" id="cut${g.key}" min="0" max="99" value="${g.cut}"><output id="out${g.key}"></output></div>
     <div class="grid"></div>
     <dl class="stats" id="st${g.key}"></dl>`;
@@ -230,11 +230,11 @@ function draw(){
     g.rows.forEach((row,i)=>{ const fl=row.s>=g.cut; g.cells[i].className="cell"+(row.y?" risk":"")+(fl?" f":"")+(!fl&&row.y?" miss":""); });
     document.getElementById("st"+g.key).innerHTML =
       `<dt>Called</dt><dd><b>${r.f}</b> of 200</dd>
-       <dt>Failed but not called (missed)</dt><dd><b>${r.miss}</b> of ${g.pos} who failed</dd>
+       <dt>Needed help, not called (missed)</dt><dd><b>${r.miss}</b> of ${g.pos}</dd>
        <dt>Called but was fine (unnecessary)</dt><dd><b>${r.fp}</b> of ${r.f} calls</dd>`;
     return r;
   });
-  const rows = [["Share of students called","flag"],["Share of failing students missed","missP"]];
+  const rows = [["Share of students called","flag"],["Share of those needing help who were missed","missP"]];
   document.getElementById("cmp").innerHTML = rows.map(([lab,k])=>{
     const a=m[0][k], b=m[1][k]; const gap = (a==null||b==null)? null : Math.abs(a-b);
     const cls = gap==null? "" : gap<=4 ? "gap-ok" : "gap-big";
